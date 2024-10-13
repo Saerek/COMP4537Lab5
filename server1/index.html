@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management</title>
+</head>
+<body>
+    <h1>Patient Management</h1>
+
+    <!-- Button to insert data -->
+    <button id="insertBtn">Insert Patient Data</button>
+    
+    <!-- Textarea for SQL queries -->
+    <textarea id="queryText" rows="4" cols="50" placeholder="Enter your SQL query here"></textarea>
+    <br>
+    
+    <!-- Button to submit the query -->
+    <button id="submitBtn">Submit SQL Query</button>
+    
+    <!-- Area to display the server response -->
+    <pre id="responseArea"></pre>
+
+    <script>
+        // Insert patient data using POST
+        document.getElementById('insertBtn').addEventListener('click', function () {
+            fetch('https://your-backend-server2.com/api/v1/patient', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'John Doe',
+                    age: 30,
+                    address: '123 Elm Street'
+                })
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('responseArea').textContent = data;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Submit SQL query (POST for INSERT, GET for SELECT)
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            const query = document.getElementById('queryText').value.trim();
+            if (query.toLowerCase().startsWith('select')) {
+                // Use GET for SELECT queries
+                fetch(`https://your-backend-server2.com/api/v1/sql?query=${encodeURIComponent(query)}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('responseArea').textContent = data;
+                })
+                .catch(error => console.error('Error:', error));
+            } else if (query.toLowerCase().startsWith('insert')) {
+                // Use POST for INSERT queries
+                fetch('https://your-backend-server2.com/api/v1/sql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('responseArea').textContent = data;
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert('Only SELECT or INSERT queries are allowed.');
+            }
+        });
+    </script>
+</body>
+</html>
